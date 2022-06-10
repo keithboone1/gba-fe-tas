@@ -22,26 +22,6 @@ namespace FE8BruteForcer
             }
         }
 
-        static void simComplexMovementTest()
-        {
-            Console.WriteLine("enter rn1, rn2, rn3:");
-
-            ushort[] initialRns = new ushort[3];
-            initialRns[0] = ushort.Parse(Console.ReadLine());
-            initialRns[1] = ushort.Parse(Console.ReadLine());
-            initialRns[2] = ushort.Parse(Console.ReadLine());
-
-            char[,] grid = new char[,] { { '1', '1', '1', '1', '3', '1'},
-                                         { 'F', '3', '1', '1', '1', 'S'},
-                                         { '1', '1', '1', '1', '1', '-'} };
-
-            MovementSim.simComplexMovement(initialRns, grid, 100);
-
-            Console.WriteLine(string.Format("RN1: {0} ({1})", initialRns[0], normalize100(initialRns[0])));
-            Console.WriteLine(string.Format("RN2: {0} ({1})", initialRns[1], normalize100(initialRns[1])));
-            Console.WriteLine(string.Format("RN3: {0} ({1})", initialRns[2], normalize100(initialRns[2])));
-        }
-
         static void bruteForce()
         {
             Console.WriteLine("enter rn1, rn2, rn3:");
@@ -81,10 +61,16 @@ namespace FE8BruteForcer
         {
             int burnThisMany = 0;
 
+            ushort[] inputRns = new ushort[3];
+            initialRns.CopyTo(inputRns, 0);
+
             while (!theseRnsWork(initialRns))
             {
                 burnThisMany += 1;
                 advanceRng(initialRns);
+                if (initialRns.Equals(inputRns)) {
+                    throw new Exception();
+                }
             }
 
             Console.WriteLine(string.Format("burn {0} RNs:", burnThisMany));
@@ -195,12 +181,27 @@ namespace FE8BruteForcer
             return (attackerCurrentHp, defenderCurrentHp);
         }
 
-        static void simLevel(ushort[] currentRns)
+        /// <param name="growthRates">array in the order [hp, str, skl, spd, def, res, lck]. If you've capped, pass in 0 for the growth rate</param>
+        /// <returns>an array of true / false in the order [hp, str, skl, spd, def, res, lck]. True means it went up.</returns>
+        static bool[] simLevel(ushort[] currentRns, int[] growthRates)
         {
-            for (int i = 0; i < 21; i++)
+            bool[] leveled = new bool[7];
+            bool anyLeveled = false;
+
+            for (int i = 0; i < 3; i++)
             {
-                advanceRng(currentRns);
+                for (int j = 0; i < 7; i++)
+                {
+                    leveled[j] = (advanceRng(currentRns) < growthRates[j]);
+                    anyLeveled = anyLeveled || leveled[j];
+                }
+                if (anyLeveled)
+                {
+                    break;
+                }
             }
+
+            return leveled;
         }
 
         // the bit that actually changes by enemy phase
@@ -209,7 +210,106 @@ namespace FE8BruteForcer
             ushort[] rnsForEp = new ushort[3];
             initialRns.CopyTo(rnsForEp, 0);
 
-            return simc12t1(rnsForEp);
+            return simc10t2(rnsForEp);
+        }
+
+        static bool simc10t2(ushort[] currentRns)
+        {
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+
+            int ephHp = 23;
+
+            combatPreview merc1 = new combatPreview(68, 0, false, 0, true, 25, 11, 6);
+            combatPreview eph1 = new combatPreview(93, 12, false, 0, true, ephHp, 19, 7);
+            MovementSim.simComplexMovement(currentRns, new char[,] { { 'S', '1', '1', '-'},
+                                                                     { '1', '1', '1', 'F' } });
+            (int, int) result = simCombat(currentRns, merc1, eph1);
+            ephHp = result.Item2;
+
+            combatPreview myrm1 = new combatPreview(100, 9, true, 0, true, 24, 19, 3);
+            combatPreview cav1 = new combatPreview(33, 0, false, 0, true, 26, 13, 7);
+            MovementSim.simSimpleMovement(currentRns, 0, 1);
+            result = simCombat(currentRns, myrm1, cav1);
+            if (result.Item2 <= 0)
+            {
+                return false;
+            }
+
+            combatPreview fighter1 = new combatPreview(53, 0);
+            combatPreview cav2 = new combatPreview(100, 2, false, 0, true, 2);
+            advanceRng(currentRns);
+            simCombat(currentRns, fighter1, cav2);
+
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+            MovementSim.simSimpleMovement(currentRns, 1, 1);
+
+            combatPreview wyvern1 = new combatPreview(53, 0, false, 0, true, 28, 22, 10);
+            combatPreview eph5 = new combatPreview(90, 12, true, 0, true, ephHp, 18, 7);
+            MovementSim.simComplexMovement(currentRns, new char[,] { { 'F', '1', '-' },
+                                                                     { '1', '1', '1' },
+                                                                     { '1', '1', '1' },
+                                                                     { '1', '1', '1' },
+                                                                     { '1', '1', 'S' } });
+            result = simCombat(currentRns, wyvern1, eph5);
+            ephHp = result.Item2;
+
+            combatPreview wyvern2 = new combatPreview(69, 0, false, 0, true, 27, 21, 11);
+            combatPreview nessa1 = new combatPreview(0, 0, false, 0, false, 17, 15, 6);
+            MovementSim.simSimpleMovement(currentRns, 0, 5);
+            simCombat(currentRns, wyvern2, nessa1);
+            
+            combatPreview boat1 = new combatPreview(49, 0, false, 0, true, 29, 29, 8);
+            combatPreview cormag1 = new combatPreview(0, 0, false, 0, false, 30, 0, 12);
+            advanceRng(currentRns);
+            simCombat(currentRns, boat1, cormag1);
+
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+
+            combatPreview shaman1 = new combatPreview(31, 4, false, 0, true, 22, 8, 3);
+            combatPreview eph2 = new combatPreview(100, 12, true, 0, true, ephHp, 20, 0);
+            advanceRng(currentRns);
+            result = simCombat(currentRns, shaman1, eph2);
+            ephHp = result.Item2;
+
+            advanceRng(currentRns);
+            advanceRng(currentRns);
+
+            combatPreview fighter2 = new combatPreview(70, 0);
+            combatPreview cav3 = new combatPreview(0, 0, false, 0, false);
+            result = simCombat(currentRns, fighter2, cav3);
+            if (result.Item2 == 0)
+            {
+                return false;
+            }
+
+            advanceRng(currentRns);
+
+            combatPreview cav4 = new combatPreview(53, 0, false, 0, true, 29, 15, 0);
+            combatPreview eph3 = new combatPreview(0, 0, false, 0, false, ephHp, 0, 7);
+            advanceRng(currentRns);
+            result = simCombat(currentRns, cav4, eph3);
+            ephHp = result.Item2;
+
+            advanceRng(currentRns);
+
+            combatPreview beran = new combatPreview(100, 4, true, 0, true, 45, 27, 17);
+            combatPreview eph4 = new combatPreview(16, 8, false, 0, true, ephHp, 32, 7);
+            result = simCombat(currentRns, beran, eph4);
+            if (result.Item1 > 0)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         static bool simc12t1(ushort[] currentRns)
@@ -354,12 +454,12 @@ namespace FE8BruteForcer
             advanceRng(currentRns);
 
             combatPreview garg1 = new combatPreview(56, 0);
-            combatPreview phant1 = new combatPreview(0, 0);
+            combatPreview phant1 = new combatPreview(85, 0);
             if (!MovementSim.simSimpleMovement(currentRns, 0, 3, 50))
             {
                 return false;
             }
-            if (simCombat(currentRns, garg1, phant1).Item2 != 0)
+            if (simCombat(currentRns, garg1, phant1).Item2 == 0)
             {
                 return false;
             }
@@ -369,7 +469,7 @@ namespace FE8BruteForcer
             combatPreview cormag1 = new combatPreview(80, 5, true, 10, true, 40, 25, 3);
             MovementSim.simSimpleMovement(currentRns, 0, 1);
             (int, int) result = simCombat(currentRns, mogall1, cormag1);
-            if (result.Item1 > 0 || result.Item2 < 40)
+            if (result.Item1 > 0 || result.Item2 != 40)
             {
                 return false;
             }
@@ -389,9 +489,9 @@ namespace FE8BruteForcer
             }
 
             combatPreview gorgon1 = new combatPreview(73, 0);
-            combatPreview eph1 = new combatPreview(66, 0);
-            MovementSim.simSimpleMovement(currentRns, 0, 3);
-            if (simCombat(currentRns, gorgon1, eph1).Item2 == 0)
+            combatPreview cormag3 = new combatPreview(66, 0);
+            MovementSim.simSimpleMovement(currentRns, 1, 3);
+            if (simCombat(currentRns, gorgon1, cormag3).Item2 == 0)
             {
                 return false;
             }
@@ -402,15 +502,16 @@ namespace FE8BruteForcer
         static bool simc18t2(ushort[] currentRns)
         {
             combatPreview bossGorgon = new combatPreview(72, 1, false, 0, true, 46, 31, 11);
-            combatPreview cormag1 = new combatPreview(66, 5, true, 11, true, 40, 25, 3);
+            combatPreview cormag1 = new combatPreview(61, 5, true, 11, true, 26, 28, 3);
             MovementSim.simSimpleMovement(currentRns, 1, 1);
             (int, int) result = simCombat(currentRns, bossGorgon, cormag1);
-            if (result.Item1 > 28 || result.Item1 <= 0 || result.Item2 < 40)
+            if (result.Item1 > 0)
             {
                 return false;
             }
 
-            // shortcut: rennac must crit at least one
+            simLevel(currentRns, new int[] { 0, 0, 0, 0, 0, 0, 0 });
+
             combatPreview garg1 = new combatPreview(22, 5, false, 0, true, 4, 1, 0);
             combatPreview rennac1 = new combatPreview(100, 35, true, 0, true, 1, 1, 0);
             MovementSim.simSimpleMovement(currentRns, 0, 4);
@@ -421,7 +522,7 @@ namespace FE8BruteForcer
             }
 
             combatPreview mogall1 = new combatPreview(61, 0, false, 0, true, 25, 17, 3);
-            combatPreview cormag2 = new combatPreview(80, 5, true, 11, true, 40, 25, 3);
+            combatPreview cormag2 = new combatPreview(75, 5, true, 11, true, 40, 28, 3);
             MovementSim.simSimpleMovement(currentRns, 3, 1);
             result = simCombat(currentRns, mogall1, cormag2);
             if (result.Item1 > 0 || result.Item2 < 40)
@@ -431,185 +532,149 @@ namespace FE8BruteForcer
 
             combatPreview mogall2 = new combatPreview(70, 0, false, 0, true, 25, 17, 5);
             combatPreview eph1 = new combatPreview(75, 0, true, 0, true, 34, 16, 16);
-            MovementSim.simSimpleMovement(currentRns, 3, 2);
+            MovementSim.simComplexMovement(currentRns, new char[,] { { 'S', '1', '1', '1',},
+                                                                     { '1', '1', '1', '1' }, 
+                                                                     { '-', '1', '1', 'F' } });
             result = simCombat(currentRns, mogall2, eph1);
             if (result.Item1 > 10)
             {
                 return false;
             }
 
-            combatPreview mogall3 = new combatPreview(68, 0, false, 0, true, 2, 1, 0);
-            combatPreview syrene1 = new combatPreview(74, 0, true, 0, true, 20, 1, 0);
-            MovementSim.simSimpleMovement(currentRns, 1, 4);
+            combatPreview mogall3 = new combatPreview(68, 0, false, 0, true, 25, 17, 4);
+            combatPreview syrene1 = new combatPreview(84, 5, true, 0, true, 27, 24, 12);
+            MovementSim.simSimpleMovement(currentRns, 0, 3);
             result = simCombat(currentRns, mogall3, syrene1);
             if (result.Item1 > 0)
             {
                 return false;
             }
 
-            combatPreview gorgon1 = new combatPreview(74, 0);
-            combatPreview phantom1 = new combatPreview(0, 0);
-            MovementSim.simSimpleMovement(currentRns, 1, 1);
-            result = simCombat(currentRns, gorgon1, phantom1);
-            if (result.Item2 > 0)
-            {
-                return false;
-            }
-
-            combatPreview gorgon2 = new combatPreview(65, 0, false, 0, true, 23, 35, 8);
-            combatPreview cormag3 = new combatPreview(68, 3, true, 11, true, 40, 25, 3);
-            MovementSim.simSimpleMovement(currentRns, 1, 1);
-            result = simCombat(currentRns, gorgon2, cormag3);
-            if (result.Item1 > 0 || result.Item2 < 40)
-            {
-                return false;
-            }
-
-            combatPreview garg2 = new combatPreview(49, 0, false, 0, true, 35, 21, 10);
-            combatPreview syrene2 = new combatPreview(73, 5, false, 0, true, 27, 21, 10);
+            combatPreview gorgon1 = new combatPreview(57, 0);
+            combatPreview rennac2 = new combatPreview(0, 0, false, 0, false);
             MovementSim.simSimpleMovement(currentRns, 2, 0);
-            result = simCombat(currentRns, garg2, syrene2);
-            if (result.Item1 == 35 || result.Item2 < 27)
+            result = simCombat(currentRns, gorgon1, rennac2);
+            if (result.Item2 <= 0)
             {
                 return false;
             }
+
+            //combatPreview garg2 = new combatPreview(49, 0, false, 0, true, 35, 21, 10);
+            //combatPreview syrene2 = new combatPreview(73, 5, false, 0, true, 27, 21, 10);
+            //MovementSim.simSimpleMovement(currentRns, 2, 0);
+            //result = simCombat(currentRns, garg2, syrene2);
+            //if (result.Item1 > 0 || result.Item2 < 27)
+            //{
+            //    return false;
+            //}
 
             return true;
         }
 
         static bool simc18t3(ushort[] currentRns)
         {
-            int cormagHp = 40;
-            int syreneHp = 22;
-            bool bael3died, bael4died, bael5died;
+            int ephHp = 23;
 
-            combatPreview bossGorgon = new combatPreview(72, 1, false, 0, true, 18, 31, 11);
-            combatPreview cormag1 = new combatPreview(66, 5, true, 12, true, cormagHp, 25, 3);
-            MovementSim.simSimpleMovement(currentRns, 1, 1);
-            (int, int) result = simCombat(currentRns, bossGorgon, cormag1);
-            cormagHp = result.Item2;
-            if (result.Item1 > 0 || cormagHp <= 0 || cormagHp == 40)
-            {
-                return false;
-            }
-
-            combatPreview bael1 = new combatPreview(44, 0, false, 0, true, 42, 30, 10);
-            combatPreview syrene1 = new combatPreview(89, 8, true, 0, true, syreneHp, 24, 10);
+            combatPreview bael1 = new combatPreview(40, 0, false, 0, true, 42, 30, 10);
+            combatPreview syrene1 = new combatPreview(92, 34, true, 0, true, 1, 22, 10);
             MovementSim.simSimpleMovement(currentRns, 0, 0);
-            result = simCombat(currentRns, bael1, syrene1);
-            syreneHp = result.Item2;
-            if (syreneHp <= 0)
+            (int, int) result = simCombat(currentRns, bael1, syrene1);
+            if (result.Item1 > 0 || result.Item2 <= 0)
             {
                 return false;
             }
 
-            combatPreview bael2 = new combatPreview(40, 0, false, 0, true, 40, 30, 10);
-            combatPreview syrene2 = new combatPreview(88, 7, true, 0, true, syreneHp, 24, 10);
-            MovementSim.simSimpleMovement(currentRns, 0, 1);
+            combatPreview bael2 = new combatPreview(42, 0, false, 0, true, 40, 30, 10);
+            combatPreview syrene2 = new combatPreview(87, 33, true, 0, true, 1, 22, 10);
+            MovementSim.simSimpleMovement(currentRns, 0, 0);
             result = simCombat(currentRns, bael2, syrene2);
-            syreneHp = result.Item2;
-            if (syreneHp <= 0)
+            if (result.Item1 > 0 || result.Item2 <= 0)
             {
                 return false;
             }
 
-            combatPreview bael3 = new combatPreview(42, 0, false, 0, true, 41, 30, 10);
-            combatPreview cormag2 = new combatPreview(82, 7, true, 12, true, cormagHp, 25, 12);
-            MovementSim.simSimpleMovement(currentRns, 4, 1);
-            result = simCombat(currentRns, bael3, cormag2);
-            if (result.Item2 <= 0)
+            // top middle
+            combatPreview bael3 = new combatPreview(52, 0, false, 0, true, 39, 29, 9);
+            combatPreview ephraim1 = new combatPreview(93, 3, true, 0, true, ephHp, 49, 11);
+            MovementSim.simSimpleMovement(currentRns, 2, 1);
+            result = simCombat(currentRns, bael3, ephraim1);
+            if (result.Item1 > 0 || result.Item2 < 0)
             {
                 return false;
             }
-            bael3died = (result.Item1 <= 0);
-            simLevel(currentRns);
+            ephHp = result.Item2;
 
-            if (bael3died)
-            {
-                combatPreview bael4 = new combatPreview(45, 0, false, 0, true, 42, 22, 9);
-                combatPreview cormag2point5 = new combatPreview(79, 6, true, 13, true, 12, 25, 12);
-                MovementSim.simSimpleMovement(currentRns, 3, 0);
-                result = simCombat(currentRns, bael4, cormag2point5);
-                if (result.Item2 < 12)
-                {
-                    return false;
-                }
-                bael4died = (result.Item1 <= 0);
-            }
-            else
-            {
-                combatPreview bael4 = new combatPreview(53, 0, false, 0, true, 42, 22, 9); // bottom bael, poison claw
-                combatPreview ephraim1 = new combatPreview(77, 2, true, 0, true, 33, 16, 11);
-                MovementSim.simSimpleMovement(currentRns, 3, 1);
-                result = simCombat(currentRns, bael4, ephraim1);
-                if (result.Item2 < 33)
-                {
-                    return false;
-                }
-                bael4died = (result.Item1 <= 0);
-            }
-
-            combatPreview bael5 = new combatPreview(44, 0, false, 0, true, 42, 30, 10);
-            combatPreview cormag3 = new combatPreview(82, 7, true, 13, true, cormagHp, 25, 12);
-            if (bael3died && bael4died)
-            {
-                MovementSim.simSimpleMovement(currentRns, 2, 1);
-            }
-            else if (bael3died || bael4died)
-            {
-                MovementSim.simSimpleMovement(currentRns, 3, 0);
-            }
-            else
-            {
-                MovementSim.simSimpleMovement(currentRns, 2, 2);
-            }
-            result = simCombat(currentRns, bael5, cormag3);
-            if (result.Item2 <= 0)
+            // bottom right
+            combatPreview bael4 = new combatPreview(50, 0, false, 0, true, 40, 22, 10);
+            combatPreview ephraim2 = new combatPreview(92, 4, true, 0, true, ephHp, 49, 11);
+            MovementSim.simSimpleMovement(currentRns, 1, 0);
+            result = simCombat(currentRns, bael4, ephraim2);
+            if (result.Item1 > 0 || result.Item2 < 0)
             {
                 return false;
             }
-            bael5died = (result.Item1 <= 0);
+            ephHp = result.Item2;
 
-            if (!bael3died && !bael4died && !bael5died)
+            // top right
+            combatPreview bael5 = new combatPreview(52, 0, false, 0, true, 41, 30, 9);
+            combatPreview ephraim3 = new combatPreview(97, 3, true, 0, true, ephHp, 49, 11);
+            MovementSim.simSimpleMovement(currentRns, 0, 1);
+            result = simCombat(currentRns, bael5, ephraim3);
+            if (result.Item1 > 0 || result.Item2 < 0)
             {
                 return false;
             }
+            ephHp = result.Item2;
 
-            combatPreview bael6 = new combatPreview(45, 0, false, 0, true, 41, 30, 10);
-            combatPreview seth1 = new combatPreview(100, 9, true, 0, true, 30, 50, 13);
+            // top left
+            combatPreview bael6 = new combatPreview(48, 0, false, 0, true, 40, 31, 9);
+            combatPreview seth1 = new combatPreview(100, 8, true, 0, true, 30, 50, 13);
             MovementSim.simSimpleMovement(currentRns, 0, 0);
             result = simCombat(currentRns, bael6, seth1);
-            if (result.Item2 < 30)
+            if (result.Item1 > 0 || result.Item2 < 0)
             {
                 return false;
             }
 
-            combatPreview bael7 = new combatPreview(46, 0, false, 0, true, 41, 30, 10);
-            combatPreview seth2 = new combatPreview(100, 8, true, 0, true, 30, 50, 13);
-            MovementSim.simSimpleMovement(currentRns, 0, 0);
-            result = simCombat(currentRns, bael7, seth2);
-            if (result.Item2 < 30)
-            {
-                return false;
-            }
+            // middle left
+            //combatPreview bael7 = new combatPreview();
+            //combatPreview ephraim4 = new combatPreview();
 
-            combatPreview garg1 = new combatPreview(59, 0, false, 0, true, 33, 36, 11);
-            combatPreview ephraim2 = new combatPreview(74, 3, true, 0, true, 33, 16, 11);
-            MovementSim.simSimpleMovement(currentRns, 1, 1);
-            result = simCombat(currentRns, garg1, ephraim2);
-            if (result.Item2 < 33)
-            {
-                return false;
-            }
+            //combatPreview bael6 = new combatPreview(45, 0, false, 0, true, 41, 30, 10);
+            //combatPreview seth1 = new combatPreview(100, 9, true, 0, true, 30, 50, 13);
+            //MovementSim.simSimpleMovement(currentRns, 0, 0);
+            //result = simCombat(currentRns, bael6, seth1);
+            //if (result.Item2 < 30)
+            //{
+            //    return false;
+            //}
 
-            combatPreview garg2 = new combatPreview(51, 0, false, 0, true, 35, 24, 11);
-            combatPreview tana1 = new combatPreview(86, 6, true, 0, true, 25, 13, 8);
-            MovementSim.simSimpleMovement(currentRns, 2, 1);
-            result = simCombat(currentRns, garg2, tana1);
-            if (result.Item2 < 25)
-            {
-                return false;
-            }
+            //combatPreview bael7 = new combatPreview(46, 0, false, 0, true, 41, 30, 10);
+            //combatPreview seth2 = new combatPreview(100, 8, true, 0, true, 30, 50, 13);
+            //MovementSim.simSimpleMovement(currentRns, 0, 0);
+            //result = simCombat(currentRns, bael7, seth2);
+            //if (result.Item2 < 30)
+            //{
+            //    return false;
+            //}
+
+            //combatPreview garg1 = new combatPreview(59, 0, false, 0, true, 33, 36, 11);
+            //combatPreview ephraim2 = new combatPreview(74, 3, true, 0, true, 33, 16, 11);
+            //MovementSim.simSimpleMovement(currentRns, 1, 1);
+            //result = simCombat(currentRns, garg1, ephraim2);
+            //if (result.Item2 < 33)
+            //{
+            //    return false;
+            //}
+
+            //combatPreview garg2 = new combatPreview(51, 0, false, 0, true, 35, 24, 11);
+            //combatPreview tana1 = new combatPreview(86, 6, true, 0, true, 25, 13, 8);
+            //MovementSim.simSimpleMovement(currentRns, 2, 1);
+            //result = simCombat(currentRns, garg2, tana1);
+            //if (result.Item2 < 25)
+            //{
+            //    return false;
+            //}
 
             //combatPreview gorg2 = new combatPreview();
             //combatPreview cormag4 = new combatPreview();
