@@ -8,6 +8,7 @@ namespace FE8BruteForcer
         {
             while (true)
             {
+                Console.WriteLine("enter 'quit' to quit, 'test' to test an enemy phase");
                 string command = Console.ReadLine();
                 switch (command)
                 {
@@ -26,30 +27,31 @@ namespace FE8BruteForcer
         {
             Console.WriteLine("enter rn1, rn2, rn3:");
 
-            ushort[] initialRns = new ushort[3];
-            initialRns[0] = ushort.Parse(Console.ReadLine());
-            initialRns[1] = ushort.Parse(Console.ReadLine());
-            initialRns[2] = ushort.Parse(Console.ReadLine());
+            ushort[] inputRns = new ushort[3];
+            inputRns[0] = ushort.Parse(Console.ReadLine());
+            inputRns[1] = ushort.Parse(Console.ReadLine());
+            inputRns[2] = ushort.Parse(Console.ReadLine());
 
             ushort[] backupRns = new ushort[3];
-            initialRns.CopyTo(backupRns, 0);
+            inputRns.CopyTo(backupRns, 0);
 
             while (true)
             {
+                Console.WriteLine("enter 'quit' to quit, 'next' to find the next successful seed, 'debug' to re-run the last successful seed.");
                 string command = Console.ReadLine();
                 switch (command)
                 {
                     case "quit":
                         return;
                     case "next":
-                        bruteForceInner(initialRns);
-                        initialRns.CopyTo(backupRns, 0);
-                        advanceRng(initialRns);
+                        bruteForceInner(inputRns);
+                        inputRns.CopyTo(backupRns, 0);
+                        advanceRng(inputRns);
                         break;
                     case "debug":
-                        backupRns.CopyTo(initialRns, 0);
-                        bruteForceInner(initialRns);
-                        advanceRng(initialRns);
+                        backupRns.CopyTo(inputRns, 0);
+                        bruteForceInner(inputRns);
+                        advanceRng(inputRns);
                         break;
                     default:
                         break;
@@ -181,7 +183,7 @@ namespace FE8BruteForcer
             return (attackerCurrentHp, defenderCurrentHp);
         }
 
-        /// <param name="growthRates">array in the order [hp, str, skl, spd, def, res, lck]. If you've capped, pass in 0 for the growth rate</param>
+        /// <param name="growthRates">array in the order [hp, str, skl, spd, def, res, lck].</param>
         /// <returns>an array of true / false in the order [hp, str, skl, spd, def, res, lck]. True means it went up.</returns>
         static bool[] simLevel(ushort[] currentRns, int[] growthRates)
         {
