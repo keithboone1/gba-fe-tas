@@ -212,7 +212,24 @@ namespace FE8BruteForcer
             ushort[] rnsForEp = new ushort[3];
             initialRns.CopyTo(rnsForEp, 0);
 
-            return simc10t2(rnsForEp);
+            return simValniFloor1Load(rnsForEp);
+        }
+
+        static bool simValniFloor1Load(ushort[] currentRns)
+        {
+            ValniEnemy[] enemies = new ValniEnemy[3];
+            enemies[0] = new ValniEnemy() { isBoss = true };
+            enemies[1] = new ValniEnemy() { dropRate = 10 };
+            enemies[2] = new ValniEnemy() { dropRate = 10 };
+
+            advanceRng(currentRns);
+            ValniEnemyOutput[] outputs = MapLoadingSim.SimValni(currentRns, enemies, 2);
+
+            foreach (ValniEnemyOutput output in outputs)
+            {
+                Console.WriteLine(Enum.GetName(typeof(octodirection), output.position));
+            }
+            return true;
         }
 
         static bool simc10t2(ushort[] currentRns)
