@@ -228,21 +228,42 @@ namespace FE8BruteForcer
         static bool simfe6c1load(ushort[] currentRns)
         {
             int[] archerGrowths = new int[7] { 70, 35, 40, 32, 15, 10, 35 };
+            int[] fighterGrowths = new int[7] { 85, 55, 35, 30, 15, 10, 15 };
             int[] brigandGrowths = new int[7] { 82, 50, 30, 20, 10, 10, 15 };
 
-            int[] archer1Growths = EnemyStatSim.rollFE6Enemy(currentRns, archerGrowths, 0, 0, 4);
-            int[] brigand1Growths = EnemyStatSim.rollFE6Enemy(currentRns, brigandGrowths, 0, 0, 4);
-            int[] archer1Hmb = EnemyStatSim.rollFE6Enemy(currentRns, archerGrowths, 0, 0, 4);
-            int[] brigand1Hmb = EnemyStatSim.rollFE6Enemy(currentRns, brigandGrowths, 0, 0, 4);
+            Enemy[] enemies = new Enemy[] { new Enemy() { growths = archerGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = brigandGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = archerGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 },
+                                            new Enemy() { growths = fighterGrowths, hardModeLevels = 4 }, };
 
-            for (int i = 0; i < 7; i++)
+            int[][] growths = EnemyStatSim.rollFE6Enemies(currentRns, enemies, true);
+
+            if (growths[5][6] > 1)
             {
-                Console.WriteLine(archer1Growths[i] + archer1Hmb[i]);
+                return false;
             }
-            Console.WriteLine("");
-            for (int i = 0; i < 7; i++)
+            if ((11 - (growths[12][4] + 2)) * 3 < (growths[12][0] + 20))
             {
-                Console.WriteLine(brigand1Growths[i] + brigand1Hmb[i]);
+                return false;
+            }
+            if ((11 - (growths[13][4] + 2)) * 3 < (growths[13][0] + 20))
+            {
+                return false;
+            }
+
+            for (int i = 0; i < 14; i++)
+            {
+                Console.WriteLine(String.Format("{0} {1} {2} {3} {4} {5} {6}", growths[i][0], growths[i][1], growths[i][2], growths[i][3], growths[i][4], growths[i][5], growths[i][6]));
             }
 
             return true;
@@ -265,9 +286,9 @@ namespace FE8BruteForcer
         static bool simValniFloor1Load(ushort[] currentRns)
         {
             ValniEnemy[] enemies = new ValniEnemy[3];
-            enemies[0] = new ValniEnemy() { isBoss = true };
-            enemies[1] = new ValniEnemy() { dropRate = 10 };
-            enemies[2] = new ValniEnemy() { dropRate = 10 };
+            enemies[0] = new ValniEnemy() { special = true, givePromoAutolevels = false };
+            enemies[1] = new ValniEnemy() { special = true, monster = true, dropRate = 10 };
+            enemies[2] = new ValniEnemy() { special = true, monster = true, dropRate = 10 };
 
             nextRn(currentRns);
             ValniEnemyOutput[] outputs = MapLoadingSim.SimValni(currentRns, enemies, 2);

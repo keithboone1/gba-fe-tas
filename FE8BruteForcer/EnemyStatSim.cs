@@ -84,5 +84,36 @@ namespace FE8BruteForcer
             }
             return finalGains;
         }
+
+        public static int[][] rollFE6Enemies(ushort[] currentRns, Enemy[] enemies, bool doubleHmb)
+        {
+            int[][] growths = new int[enemies.Length][];
+
+            for (int i = 0; i < enemies.Length; i++)
+            {
+                growths[i] = rollFE6Enemy(currentRns, enemies[i].growths, enemies[i].unpromotedLevels, enemies[i].promotedLevels, enemies[i].hardModeLevels);
+            }
+            if (doubleHmb)
+            {
+                for (int i = 0; i < enemies.Length; i++)
+                {
+                    int[] doubledHmb = rollFE6Enemy(currentRns, enemies[i].growths, 0, 0, enemies[i].hardModeLevels);
+                    for (int j = 0; j < 7; j++)
+                    {
+                        growths[i][j] += doubledHmb[j];
+                    }
+                }
+            }
+
+            return growths;
+        }
+    }
+
+    public class Enemy
+    {
+        public int[] growths = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        public int unpromotedLevels = 0;
+        public int promotedLevels = 0;
+        public int hardModeLevels = 0;
     }
 }
