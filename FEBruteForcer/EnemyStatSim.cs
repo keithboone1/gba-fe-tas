@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FE8BruteForcer
+namespace FEBruteForcer
 {
     class EnemyStatSim
     {
@@ -13,22 +13,22 @@ namespace FE8BruteForcer
             int length = rollLuck ? 7 : 6;
             int[] coeffs = new int[length];
             int[] rns = new int[length];
-            coeffs[0] = FE8BruteForcer.nextRn();
-            rns[0] = FE8BruteForcer.nextRn();
-            coeffs[1] = FE8BruteForcer.nextRn();
-            rns[1] = FE8BruteForcer.nextRn();
-            coeffs[2] = FE8BruteForcer.nextRn();
-            rns[2] = FE8BruteForcer.nextRn();
-            coeffs[3] = FE8BruteForcer.nextRn();
-            rns[3] = FE8BruteForcer.nextRn();
-            coeffs[4] = FE8BruteForcer.nextRn();
-            rns[4] = FE8BruteForcer.nextRn();
-            coeffs[5] = FE8BruteForcer.nextRn();
-            rns[5] = FE8BruteForcer.nextRn();
+            coeffs[0] = FEBruteForcer.nextRn();
+            rns[0] = FEBruteForcer.nextRn();
+            coeffs[1] = FEBruteForcer.nextRn();
+            rns[1] = FEBruteForcer.nextRn();
+            coeffs[2] = FEBruteForcer.nextRn();
+            rns[2] = FEBruteForcer.nextRn();
+            coeffs[3] = FEBruteForcer.nextRn();
+            rns[3] = FEBruteForcer.nextRn();
+            coeffs[4] = FEBruteForcer.nextRn();
+            rns[4] = FEBruteForcer.nextRn();
+            coeffs[5] = FEBruteForcer.nextRn();
+            rns[5] = FEBruteForcer.nextRn();
             if (rollLuck)
             {
-                coeffs[6] = FE8BruteForcer.nextRn();
-                rns[6] = FE8BruteForcer.nextRn();
+                coeffs[6] = FEBruteForcer.nextRn();
+                rns[6] = FEBruteForcer.nextRn();
             }
 
             int[] procs = new int[length];
@@ -48,7 +48,7 @@ namespace FE8BruteForcer
 
         public static int[] rollEnemy(int[] growthRates, int unpromotedLevels, int promotedLevels, int hardModeLevels)
         {
-            bool rollLuck = (FE8BruteForcer.game == 7 ? false : true);
+            bool rollLuck = (FEBruteForcer.game == 7 ? false : true);
             int length = (!rollLuck ? 6 : 7);
             int[] zeroes = new int[length];
             Array.Fill(zeroes, 0);

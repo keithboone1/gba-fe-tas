@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FE8BruteForcer
+namespace FEBruteForcer
 {
     class MovementSim
     {
         public static bool simSimpleMovement(int totalX, int totalY, int moveChance = 100)
         {
-            if (FE8BruteForcer.nextRn() >= moveChance)
+            if (FEBruteForcer.nextRn() >= moveChance)
             {
                 return false;
             };
@@ -17,7 +17,7 @@ namespace FE8BruteForcer
 
             while (totalX > spentX && totalY > spentY)
             {
-                if (FE8BruteForcer.nextRn() < 50)
+                if (FEBruteForcer.nextRn() < 50)
                 {
                     spentX += 1;
                 }
@@ -37,7 +37,7 @@ namespace FE8BruteForcer
         // F: finish
         public static bool simComplexMovement(char[,] grid, int moveChance = 100)
         {
-            if (FE8BruteForcer.nextRn() >= moveChance)
+            if (FEBruteForcer.nextRn() >= moveChance)
             {
                 return false;
             }
@@ -197,7 +197,7 @@ namespace FE8BruteForcer
 
         static (int, int) pickMove(List<(int, int)> validMoves)
         {
-            int roll = (validMoves.Count == 1) ? 0 : FE8BruteForcer.nextRnTrue();
+            int roll = (validMoves.Count == 1) ? 0 : FEBruteForcer.nextRnTrue();
             int index = roll * validMoves.Count / 65536;
             return validMoves[index];
         }

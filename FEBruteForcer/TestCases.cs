@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FE8BruteForcer
+namespace FEBruteForcer
 {
     // The actual enemy phase or stat generation under test. Will keep some old examples around as a style hint.
     // Plus can use them to regression test...
@@ -8,7 +8,7 @@ namespace FE8BruteForcer
     {
         public static bool simfe6c1load()
         {
-            FE8BruteForcer.game = 6;
+            FEBruteForcer.game = 6;
 
             int[] archerGrowths = new int[7] { 70, 35, 40, 32, 15, 10, 35 };
             int[] fighterGrowths = new int[7] { 85, 55, 35, 30, 15, 10, 15 };
@@ -54,14 +54,14 @@ namespace FE8BruteForcer
 
         public static bool simValniFloor1Load()
         {
-            FE8BruteForcer.game = 8;
+            FEBruteForcer.game = 8;
 
             ValniEnemy[] enemies = new ValniEnemy[3];
             enemies[0] = new ValniEnemy() { special = true, givePromoAutolevels = false };
             enemies[1] = new ValniEnemy() { special = true, monster = true, dropRate = 10 };
             enemies[2] = new ValniEnemy() { special = true, monster = true, dropRate = 10 };
 
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
             ValniEnemyOutput[] outputs = MapLoadingSim.SimValni(enemies, 2);
 
             foreach (ValniEnemyOutput output in outputs)
@@ -73,13 +73,13 @@ namespace FE8BruteForcer
 
         public static bool simc10t2()
         {
-            FE8BruteForcer.game = 8;
+            FEBruteForcer.game = 8;
 
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
 
             int ephHp = 23;
 
@@ -101,13 +101,13 @@ namespace FE8BruteForcer
 
             CombatPreview fighter1 = new CombatPreview() { hit = 53 };
             CombatPreview cav2 = new CombatPreview() { hit = 100, crit = 2, currentHp = 2 };
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
             CombatSim.simCombat(fighter1, cav2);
 
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
             MovementSim.simSimpleMovement(1, 1);
 
             CombatPreview wyvern1 = new CombatPreview() { hit = 53, currentHp = 28, atk = 22, def = 10 };
@@ -127,21 +127,21 @@ namespace FE8BruteForcer
 
             CombatPreview boat1 = new CombatPreview() { hit = 49, atk = 29 };
             CombatPreview cormag1 = new CombatPreview() { inRange = false, currentHp = 30, def = 12 };
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
             CombatSim.simCombat(boat1, cormag1);
 
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
 
             CombatPreview shaman1 = new CombatPreview() { hit = 31, crit = 4, currentHp = 22, atk = 8, def = 3 };
             CombatPreview eph2 = new CombatPreview() { hit = 100, crit = 12, doubles = true, currentHp = ephHp, atk = 20, def = 0 };
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
             result = CombatSim.simCombat(shaman1, eph2);
             ephHp = result.Item2;
 
-            FE8BruteForcer.nextRn();
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
 
             CombatPreview fighter2 = new CombatPreview() { hit = 70 };
             CombatPreview cav3 = new CombatPreview() { inRange = false };
@@ -151,14 +151,14 @@ namespace FE8BruteForcer
                 return false;
             }
 
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
             CombatPreview cav4 = new CombatPreview() { hit = 53, atk = 15 };
             CombatPreview eph3 = new CombatPreview() { inRange = false, currentHp = ephHp, def = 7 };
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
             result = CombatSim.simCombat(cav4, eph3);
             ephHp = result.Item2;
 
-            FE8BruteForcer.nextRn();
+            FEBruteForcer.nextRn();
 
             CombatPreview beran = new CombatPreview() { hit = 100, crit = 4, doubles = true, currentHp = 45, atk = 27, def = 17 };
             CombatPreview eph4 = new CombatPreview() { hit = 16, crit = 8, currentHp = ephHp, atk = 32, def = 7 };

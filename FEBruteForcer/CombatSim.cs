@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FE8BruteForcer
+namespace FEBruteForcer
 {
     class CombatSim
     {
@@ -9,7 +9,7 @@ namespace FE8BruteForcer
             bool sureStrike = false;
             if (attackerPreview.sureStrike)
             {
-                int sureStrikeRn = FE8BruteForcer.nextRn();
+                int sureStrikeRn = FEBruteForcer.nextRn();
                 if (sureStrikeRn < attackerPreview.level)
                 {
                     sureStrike = true;
@@ -18,8 +18,8 @@ namespace FE8BruteForcer
 
             if (!sureStrike)
             {
-                int hitRn1 = FE8BruteForcer.nextRn();
-                int hitRn2 = FE8BruteForcer.nextRn();
+                int hitRn1 = FEBruteForcer.nextRn();
+                int hitRn2 = FEBruteForcer.nextRn();
 
                 if ((hitRn1 + hitRn2) >= attackerPreview.hit * 2)
                 {
@@ -30,7 +30,7 @@ namespace FE8BruteForcer
             bool greatShield = false;
             if (defenderPreview.greatShield)
             {
-                int greatShieldRn = FE8BruteForcer.nextRn();
+                int greatShieldRn = FEBruteForcer.nextRn();
                 if (greatShieldRn < attackerPreview.level)
                 {
                     greatShield = true;
@@ -40,7 +40,7 @@ namespace FE8BruteForcer
             bool pierced = false;
             if (attackerPreview.pierce && !greatShield)
             {
-                int pierceRn = FE8BruteForcer.nextRn();
+                int pierceRn = FEBruteForcer.nextRn();
                 if (pierceRn < attackerPreview.level)
                 {
                     pierced = true;
@@ -48,7 +48,7 @@ namespace FE8BruteForcer
             }
 
             bool crit = false;
-            int critRn = FE8BruteForcer.nextRn();
+            int critRn = FEBruteForcer.nextRn();
             if (critRn < attackerPreview.crit)
             {
                 crit = true;
@@ -57,7 +57,7 @@ namespace FE8BruteForcer
             bool silencer = false;
             if (crit)
             {
-                int silencerRn = FE8BruteForcer.nextRn();
+                int silencerRn = FEBruteForcer.nextRn();
                 if (attackerPreview.silencer && silencerRn < 50)
                 {
                     silencer = true;

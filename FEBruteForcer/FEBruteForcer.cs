@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace FE8BruteForcer
+namespace FEBruteForcer
 {
-    class FE8BruteForcer
+    class FEBruteForcer
     {
         static void Main(string[] args)
         {

@@ -1,4 +1,4 @@
-﻿namespace FE8BruteForcer
+﻿namespace FEBruteForcer
 {
     class LevelUpSim
     {
@@ -15,7 +15,7 @@
                 {
                     int guaranteed = growthRates[j] / 100;
                     int randomPortion = growthRates[j] % 100;
-                    int randomLevel = FE8BruteForcer.nextRn() < randomPortion ? 1 : 0;
+                    int randomLevel = FEBruteForcer.nextRn() < randomPortion ? 1 : 0;
                     leveled[j] = guaranteed + randomLevel;
                     anyLeveled = anyLeveled || (leveled[j] > 0);
                 }

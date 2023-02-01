@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace FE8BruteForcer
+namespace FEBruteForcer
 {
     class MapLoadingSim
     {
@@ -12,7 +12,7 @@ namespace FE8BruteForcer
 
             while (assignedMovers < numberOfMovers)
             {
-                int newIndex = FE8BruteForcer.nextRnTrue() * possibleMovers.Length / 65536;
+                int newIndex = FEBruteForcer.nextRnTrue() * possibleMovers.Length / 65536;
                 if (!possibleMovers[newIndex].moves)
                 {
                     assignedMovers += 1;
@@ -28,21 +28,21 @@ namespace FE8BruteForcer
             if (input.monster)
             {
                 //class
-                FE8BruteForcer.nextRn();
+                FEBruteForcer.nextRn();
 
                 //level
-                FE8BruteForcer.nextRn();
+                FEBruteForcer.nextRn();
                 int LEVELS_PLACEHOLDER = 1; // until i figure out how valni level generation works, this will at least cause stat rolls to happen.
 
                 //held item
-                FE8BruteForcer.nextRn();
-                FE8BruteForcer.nextRn();
+                FEBruteForcer.nextRn();
+                FEBruteForcer.nextRn();
 
                 //dropped item
-                bool doesDrop = (FE8BruteForcer.nextRn() < input.dropRate);
+                bool doesDrop = (FEBruteForcer.nextRn() < input.dropRate);
                 if (doesDrop)
                 {
-                    FE8BruteForcer.nextRn();
+                    FEBruteForcer.nextRn();
                 }
 
                 //stat rolls
@@ -56,7 +56,7 @@ namespace FE8BruteForcer
             // movement
             if (input.moves)
             {
-                output.position = (octodirection)(FE8BruteForcer.nextRnTrue() * 8 / 65536);
+                output.position = (octodirection)(FEBruteForcer.nextRnTrue() * 8 / 65536);
             }
 
             return output;
