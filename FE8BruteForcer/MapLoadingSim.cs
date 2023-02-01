@@ -5,14 +5,14 @@ namespace FE8BruteForcer
 {
     class MapLoadingSim
     {
-        public static void SetValniMovers(ushort[] currentRns, ValniEnemy[] enemies, int numberOfMovers)
+        public static void SetValniMovers(ValniEnemy[] enemies, int numberOfMovers)
         {
             int assignedMovers = 0;
             ValniEnemy[] possibleMovers = enemies.Where(e => e.special).ToArray();
 
             while (assignedMovers < numberOfMovers)
             {
-                int newIndex = FE8BruteForcer.nextRnTrue(currentRns) * possibleMovers.Length / 65536;
+                int newIndex = FE8BruteForcer.nextRnTrue() * possibleMovers.Length / 65536;
                 if (!possibleMovers[newIndex].moves)
                 {
                     assignedMovers += 1;
@@ -21,42 +21,42 @@ namespace FE8BruteForcer
             }
         }
 
-        public static ValniEnemyOutput SimValniEnemy(ushort[] currentRns, ValniEnemy input)
+        public static ValniEnemyOutput SimValniEnemy(ValniEnemy input)
         {
             ValniEnemyOutput output = new ValniEnemyOutput();
 
             if (input.monster)
             {
                 //class
-                FE8BruteForcer.nextRn(currentRns);
+                FE8BruteForcer.nextRn();
 
                 //level
-                FE8BruteForcer.nextRn(currentRns);
+                FE8BruteForcer.nextRn();
                 int LEVELS_PLACEHOLDER = 1; // until i figure out how valni level generation works, this will at least cause stat rolls to happen.
 
                 //held item
-                FE8BruteForcer.nextRn(currentRns);
-                FE8BruteForcer.nextRn(currentRns);
+                FE8BruteForcer.nextRn();
+                FE8BruteForcer.nextRn();
 
                 //dropped item
-                bool doesDrop = (FE8BruteForcer.nextRn(currentRns) < input.dropRate);
+                bool doesDrop = (FE8BruteForcer.nextRn() < input.dropRate);
                 if (doesDrop)
                 {
-                    FE8BruteForcer.nextRn(currentRns);
+                    FE8BruteForcer.nextRn();
                 }
 
                 //stat rolls
-                EnemyStatSim.rollFE8Enemy(currentRns, input.growthRates, input.givePromoAutolevels ? 19 : 0, LEVELS_PLACEHOLDER, input.hmLevels);
+                EnemyStatSim.rollEnemy(input.growthRates, input.givePromoAutolevels ? 19 : 0, LEVELS_PLACEHOLDER, input.hmLevels);
             } 
             else
             {
-                EnemyStatSim.rollFE8Enemy(currentRns, input.growthRates, input.givePromoAutolevels ? 19 : 0, input.level, input.hmLevels);
+                EnemyStatSim.rollEnemy(input.growthRates, input.givePromoAutolevels ? 19 : 0, input.level, input.hmLevels);
             }
 
             // movement
             if (input.moves)
             {
-                output.position = (octodirection)(FE8BruteForcer.nextRnTrue(currentRns) * 8 / 65536);
+                output.position = (octodirection)(FE8BruteForcer.nextRnTrue() * 8 / 65536);
             }
 
             return output;
@@ -68,15 +68,15 @@ namespace FE8BruteForcer
          * NOTE that this is not their final positions, because it doesn't handle collision checks. You'll need to run those by hand afterward.
          * In the future I'd like to handle stat generation, weapon drops, etc., but I'm lazy and don't tend to code stuff until someone needs it for an LTC.
          */
-        public static ValniEnemyOutput[] SimValni(ushort[] currentRns, ValniEnemy[] enemies, int numberOfMovers)
+        public static ValniEnemyOutput[] SimValni(ValniEnemy[] enemies, int numberOfMovers)
         {
             ValniEnemyOutput[] outputs = new ValniEnemyOutput[enemies.Length];
 
-            SetValniMovers(currentRns, enemies, numberOfMovers);
+            SetValniMovers(enemies, numberOfMovers);
 
             for (int i = 0; i < enemies.Length; i += 1)
             {
-                outputs[i] = SimValniEnemy(currentRns, enemies[i]);
+                outputs[i] = SimValniEnemy(enemies[i]);
             }
 
             return outputs;

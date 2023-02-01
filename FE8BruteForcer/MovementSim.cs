@@ -5,9 +5,9 @@ namespace FE8BruteForcer
 {
     class MovementSim
     {
-        public static bool simSimpleMovement(ushort[] currentRns, int totalX, int totalY, int moveChance = 100)
+        public static bool simSimpleMovement(int totalX, int totalY, int moveChance = 100)
         {
-            if (FE8BruteForcer.nextRn(currentRns) >= moveChance)
+            if (FE8BruteForcer.nextRn() >= moveChance)
             {
                 return false;
             };
@@ -17,7 +17,7 @@ namespace FE8BruteForcer
 
             while (totalX > spentX && totalY > spentY)
             {
-                if (FE8BruteForcer.nextRn(currentRns) < 50)
+                if (FE8BruteForcer.nextRn() < 50)
                 {
                     spentX += 1;
                 }
@@ -35,9 +35,9 @@ namespace FE8BruteForcer
         // -: untraversable
         // S: start
         // F: finish
-        public static bool simComplexMovement(ushort[] currentRns, char[,] grid, int moveChance = 100)
+        public static bool simComplexMovement(char[,] grid, int moveChance = 100)
         {
-            if (FE8BruteForcer.nextRn(currentRns) >= moveChance)
+            if (FE8BruteForcer.nextRn() >= moveChance)
             {
                 return false;
             }
@@ -47,7 +47,7 @@ namespace FE8BruteForcer
             while (!currentIndex.Equals(startIndex))
             {
                 List<(int, int)> validMoves = getValidMoves(costs, currentIndex);
-                currentIndex = pickMove(currentRns, validMoves);
+                currentIndex = pickMove(validMoves);
             }
 
             return true;
@@ -195,9 +195,9 @@ namespace FE8BruteForcer
             return validMoves;
         }
 
-        static (int, int) pickMove(ushort[] currentRns, List<(int, int)> validMoves)
+        static (int, int) pickMove(List<(int, int)> validMoves)
         {
-            int roll = (validMoves.Count == 1) ? 0 : FE8BruteForcer.nextRnTrue(currentRns);
+            int roll = (validMoves.Count == 1) ? 0 : FE8BruteForcer.nextRnTrue();
             int index = roll * validMoves.Count / 65536;
             return validMoves[index];
         }
