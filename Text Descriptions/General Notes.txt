@@ -1,0 +1,12 @@
+The GBA RNG generates unsigned 16-bit integers, i.e. numbers in a range between 0 and 655,35. The next RN is a function of only the three previously generated RNs. If we notate these as RN1, RN2, and RN3, with RN1 being the oldest and RN3 being the most recently generated RN, then the function is as follows:
+
+(RN3 >> 5) ^ (RN2 << 11) ^ (RN1 << 1) ^ (RN2 >> 15)
+
+You almost certainly don't need to know what this formula means though. After the new RN is generated and used, it becomes RN3; RN3 becomes RN2; RN2 becomes RN1; and RN1 is discarded. Then we're ready for the next call to the RNG.
+
+After being generated, the RN is resized to fit the range actually needed for the calculation. For most of its randomization, FE uses percent-based chances. To get an RN from 0 to 99 for percent-based calculations, the conversion is simply: (RN * 100 / 65536), rounded down. There are rare exceptions where FE does not use percents, related to picking between x equally-likely options, but the conversion is basically the same. For example, to pick between 3 options, use (RN * 3 / 65536), rounded down. In other pages, when I refer to RNs, I'll generally be using the range of 0 to 99. I'll note when the range is anything else.
+
+This probably isn't news to anyone reading these pages, but when you boot up a GBA FE game, the RNG is always seeded with the same values for RN1, RN2, and RN3. Additionally, new RNG calls are only made when random numbers are actually required. Lastly, the player can consistently burn arbitrary RNs on player phase by drawing movement arrows -- read the Movement page if don't know how. Combining these three facts, we can (almost) always set the exact RN seed that we want for any specific player phase action, any entire enemy phase, or any initial map load. Rigging player phase actions is trivial enough to do with just an RN viewing Lua script and knowledge about how RNs are burned. However, rigging entire enemy phases and map loads, which can consume hundreds of RNs at once, is difficult. You basically need either trial-and-error or a TAS.
+
+Errata:
+ * In FE6, because of a bug, RNs are normalized incorrectly. The divisor is 65500 instead of 65536, so numbers are generally slightly higher than they should be.

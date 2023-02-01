@@ -1,0 +1,20 @@
+Combat isn't too complex. To quickly define my terms:
+
+Attack: A single hit with a weapon. Brave weapons have two attacks.
+Attacker: the one who is dealing damage -- not necessarily the one who initiated combat
+Defender: the one who is receiving damage.
+
+Each attack works as follows:
+
+1. FE8: If the attacker has Sure Strike, one RN is rolled to see if it procs. If the RN is lower than the attacker's level, the attack hits.
+2. If Sure Strike didn't proc, two RNs are rolled for the hit check. The average of these RNs, (RN1 + RN2) / 2, is compared to the hit rate; if it's lower, the attack hits.
+   For example, if the 2 RNs are 46 and 94, then any attack with a hit rate of at least 71 will connect. (46 + 94) / 2 = 70, so the hit rate has to be greater than 70.
+
+If the attack missed, the attack ends here. Otherwise,
+
+3. FE8: If the defender has Great Shield, one RN is rolled to see if it procs. If the RN is lower than the ATTACKER's level, the attack always does zero damage.
+4. FE8: If the attacker has Pierce, and the defender did not proc Great Shield, one RN is rolled to see if Pierce procs. If the RN is lower than the attacker's level, the attack ignores defense.
+5. One RN is rolled to see if a crit procs (even if the attacker has 0 crit rate, the attack does 0 damage, or Great Shield procced). If the RN is lower than the crit rate, a crit occurs.
+6. FE7/8: If a crit occurred, one RN is rolled to see if Silencer procs (even if the attack did 0 damage, Great Shield procced, or the attacker doesn't have Silencer). If the RN is lower than 50, and the attacker actually has Silencer, the enemy automatically dies.
+
+Simply repeat these six steps for every attack in the combat. In vanilla GBA, there are no mechanics that break this paradigm -- all mechanics are checked anew for each individual attack. When you add in SkillSys, stuff probably goes stupid, but that's beyond my scope.

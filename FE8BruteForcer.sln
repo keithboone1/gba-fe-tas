@@ -3,7 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FE8BruteForcer", "FE8BruteForcer\FE8BruteForcer.csproj", "{29F75AB3-3B1E-4273-A615-629034F5412B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FE8BruteForcer", "FE8BruteForcer\FE8BruteForcer.csproj", "{29F75AB3-3B1E-4273-A615-629034F5412B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Text Descriptions", "Text Descriptions", "{2C3F8704-8E3B-43BA-A1AB-EAD77F4DCE4D}"
+	ProjectSection(SolutionItems) = preProject
+		Text Descriptions\Combat.txt = Text Descriptions\Combat.txt
+		Text Descriptions\Enemy Stat Generation.txt = Text Descriptions\Enemy Stat Generation.txt
+		Text Descriptions\General Notes.txt = Text Descriptions\General Notes.txt
+		Text Descriptions\Level Ups.txt = Text Descriptions\Level Ups.txt
+		Text Descriptions\Movement.txt = Text Descriptions\Movement.txt
+		Text Descriptions\README.txt = Text Descriptions\README.txt
+		Text Descriptions\Valni and Lagdou Enemy Stat Generation.txt = Text Descriptions\Valni and Lagdou Enemy Stat Generation.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

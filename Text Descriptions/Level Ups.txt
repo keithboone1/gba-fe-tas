@@ -1,0 +1,19 @@
+Level ups are pretty simple. The game pulls 7 random numbers, starting with HP, and compares them to the character's growth rates. For each RN which is lower than the respective growth rate, the character gains that stat.
+
+For example, say that the 7 RNs rolled are as follows:
+ HP ST SK SP DF RS LK
+  7 81 32 87 21 45  0
+
+And the character's growths are as follows:
+ HP ST SK SP DF RS LK
+ 40 35 40 50 15 45 50
+
+The character would gain HP, Skill, and Luck.
+
+Note the following errata:
+ * The character does not gain Res, because the RN rolled has to be less than the growth rate. Equal to the growth rate doesn't count.
+ * Despite its position on the stat screen, luck is rolled *last*, not between Speed and Defense
+
+If a unit doesn't grow a single stat, the game rolls a new set of 7 RNs and uses those for the level up. If the unit *still* fails to grow a single stat, the game rolls yet another set of 7 RNs and uses those for the level up. This will only happen twice: If the third set of RNs still fails to gain any stats, the unit gets a blank level up. So on 0% growths ROMs, you will see level-ups consume 21 RNs, while on 100% ROMs, they will always consume 7 RNs. Most of the time on normal ROMs they'll also consume 7 RNs, but Jagens and such can trigger this re-rolling sometimes.
+
+Last thing to note is that if a unit tries and fails to level a capped stat, that will still prevent the re-roll. So if a unit only rolls level-ups in capped stats, they can get a blank level while only consuming 7 (or 14) RNs.

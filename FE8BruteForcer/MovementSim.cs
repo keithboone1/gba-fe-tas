@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace FE8BruteForcer
 {
@@ -6,7 +7,7 @@ namespace FE8BruteForcer
     {
         public static bool simSimpleMovement(ushort[] currentRns, int totalX, int totalY, int moveChance = 100)
         {
-            if (FE8BruteForcer.advanceRng(currentRns) >= moveChance)
+            if (FE8BruteForcer.nextRn(currentRns) >= moveChance)
             {
                 return false;
             };
@@ -16,7 +17,7 @@ namespace FE8BruteForcer
 
             while (totalX > spentX && totalY > spentY)
             {
-                if (FE8BruteForcer.advanceRng(currentRns) < 50)
+                if (FE8BruteForcer.nextRn(currentRns) < 50)
                 {
                     spentX += 1;
                 }
@@ -36,7 +37,7 @@ namespace FE8BruteForcer
         // F: finish
         public static bool simComplexMovement(ushort[] currentRns, char[,] grid, int moveChance = 100)
         {
-            if (FE8BruteForcer.advanceRng(currentRns) >= moveChance)
+            if (FE8BruteForcer.nextRn(currentRns) >= moveChance)
             {
                 return false;
             }
@@ -45,9 +46,8 @@ namespace FE8BruteForcer
 
             while (!currentIndex.Equals(startIndex))
             {
-                bool[] validMoves = getValidMoves(costs, currentIndex, out int validMoveCount);
-
-                currentIndex = moveOneSpace(currentRns, validMoves, validMoveCount, currentIndex);
+                List<(int, int)> validMoves = getValidMoves(costs, currentIndex);
+                currentIndex = pickMove(currentRns, validMoves);
             }
 
             return true;
@@ -140,13 +140,12 @@ namespace FE8BruteForcer
         }
 
         // It is important to evaluate in the order right left up down. This is the order that the RNG uses to pick a path.
-        static bool[] getValidMoves(int[,] costs, (int, int) currentIndex, out int validMoveCount)
+        static List<(int, int)> getValidMoves(int[,] costs, (int, int) currentIndex)
         {
             int[] adjacentCosts = new int[] { 100, 100, 100, 100 }; // right left up down
             int lowestCost = 100;
 
-            bool[] validMoves = new bool[] { false, false, false, false }; // right left up down
-            validMoveCount = 0;
+            List<(int, int)> validMoves = new List<(int, int)>();
 
             if (currentIndex.Item2 + 1 != costs.GetLength(1)) // right
             {
@@ -173,51 +172,34 @@ namespace FE8BruteForcer
                 lowestCost = Math.Min(lowestCost, adjacentCosts[i]);
             }
 
-            for (int i = 0; i < adjacentCosts.Length; i++)
+            if (adjacentCosts[0] == lowestCost)
             {
-                if (adjacentCosts[i] == lowestCost)
-                {
-                    validMoves[i] = true;
-                    validMoveCount += 1;
-                }
+                validMoves.Add((currentIndex.Item1, currentIndex.Item2 + 1));
+            }
+
+            if (adjacentCosts[1] == lowestCost)
+            {
+                validMoves.Add((currentIndex.Item1, currentIndex.Item2 - 1));
+            }
+
+            if (adjacentCosts[2] == lowestCost)
+            {
+                validMoves.Add((currentIndex.Item1 - 1, currentIndex.Item2));
+            }
+
+            if (adjacentCosts[3] == lowestCost)
+            {
+                validMoves.Add((currentIndex.Item1 + 1, currentIndex.Item2));
             }
 
             return validMoves;
         }
 
-        static (int, int) moveOneSpace(ushort[] currentRns, bool[] validMoves, int validMoveCount, (int, int) currentIndex)
+        static (int, int) pickMove(ushort[] currentRns, List<(int, int)> validMoves)
         {
-
-            int roll = (validMoveCount == 1) ? 0 : FE8BruteForcer.advanceRng(currentRns);
-            int passIfUnder = (100 / validMoveCount);
-
-            for (int i = 0; i < validMoves.Length; i++)
-            {
-                if (!validMoves[i])
-                {
-                    continue;
-                }
-                if (roll >= passIfUnder)
-                {
-                    passIfUnder += (100 / validMoveCount);
-                    if (passIfUnder == 66)
-                    {
-                        passIfUnder += 1; // easier than using floats or something
-                    }
-                    continue;
-                }
-
-                switch (i)
-                {
-                    case 0: return (currentIndex.Item1, currentIndex.Item2 + 1);
-                    case 1: return (currentIndex.Item1, currentIndex.Item2 - 1);
-                    case 2: return (currentIndex.Item1 - 1, currentIndex.Item2);
-                    case 3: return (currentIndex.Item1 + 1, currentIndex.Item2);
-                    default: break;
-                }
-            }
-
-            throw new Exception();
+            int roll = (validMoves.Count == 1) ? 0 : FE8BruteForcer.nextRnTrue(currentRns);
+            int index = roll * validMoves.Count / 65536;
+            return validMoves[index];
         }
     }
 }

@@ -1,0 +1,15 @@
+When FE wants to generate a path from point A to point B, it uses the following algorithm:
+
+Calculate all of the lowest-cost paths from Point A to Point B. Then, starting from Point B, move one tile at a time *backward* to Point A. If there are multiple adjacent tiles which are on at least one of the lowest-cost paths, roll one RN to decide which one to move to. From lowest to highest, the movement directions are: right, left, up, down.
+
+So, for example, if it's equally fast to move right or down, then a single RN is rolled and normalized between 0 and 1. 0 moves right; 1 moves down.
+If it's equally fast to move left, right, or down, then a single RN is rolled and normalized between 0 and 2. 0 moves right; 1 moves left; 2 moves down.
+
+Because of how this algorithm works, movement burns an indeterminate number of RNs. For example, imagine wanting to draw a path that goes down 2 and right 3. Starting from the bottom-right tile (point B), the game can equally pick up or left, assuming no terrain gets in the way. If it randomly picks left twice in a row, then now it can only pick up, so it only needs to burn 2 RNs to draw the path. On the other hand, if it randomly picks up three times in a row, then it burns 3 RNs to draw the path. It's even possible to burn 4 RNs by randomly picking left once and up twice.
+
+
+When enemies are moving, Point A is always their starting position, and Point B is their ending position.
+
+When player units are moving, and the game is drawing arrows, it's a bit more complicated. Point B is always the cursor's position. Generally, Point A is the current arrowhead. However, if there is no visible arrowhead, or if the player unit's Mov isn't high enough to go from the arrowhead to Point B, then Point A is the player unit's position.
+
+For the most part, while the game is drawing arrows, it isn't burning RNs. That's because the most normal use case is the cursor moving one tile at a time, so Point A and Point B are directly adjacent. However, there are a few ways to trick the game into burning RNs drawing arrows. One is to move the cursor over inaccessible terrain; when it re-enters accessible terrain, there will be a "jump" from the arrowhead to the cursor. The other is to draw a wiggly or circular arrow, so that the unit runs out of Mov and a new arrow is drawn from the player to the cursor. These two tricks are how players are able to burn arbitrary numbers of RNs in GBA FE.

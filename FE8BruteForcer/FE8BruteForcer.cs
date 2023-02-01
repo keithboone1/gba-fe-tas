@@ -46,12 +46,12 @@ namespace FE8BruteForcer
                     case "next":
                         bruteForceInner(inputRns);
                         inputRns.CopyTo(backupRns, 0);
-                        advanceRng(inputRns);
+                        nextRn(inputRns);
                         break;
                     case "debug":
                         backupRns.CopyTo(inputRns, 0);
                         bruteForceInner(inputRns);
-                        advanceRng(inputRns);
+                        nextRn(inputRns);
                         break;
                     default:
                         break;
@@ -69,7 +69,7 @@ namespace FE8BruteForcer
             while (!theseRnsWork(initialRns))
             {
                 burnThisMany += 1;
-                advanceRng(initialRns);
+                nextRn(initialRns);
                 if (initialRns.Equals(inputRns)) {
                     throw new Exception();
                 }
@@ -81,24 +81,34 @@ namespace FE8BruteForcer
             Console.WriteLine(string.Format("RN3: {0} ({1})", initialRns[2], normalize100(initialRns[2])));
         }
 
-        public static int advanceRng(ushort[] currentRns)
+        public static int nextRnTrue(ushort[] currentRns)
+        {
+            return advanceRng(currentRns);
+        }
+
+        public static int nextRn(ushort[] currentRns)
+        {
+            return normalize100(advanceRng(currentRns));
+        }
+
+        private static ushort advanceRng(ushort[] currentRns)
         {
             ushort nextRn = (ushort)((currentRns[2] >> 5) ^ (currentRns[1] << 11) ^ (currentRns[0] << 1) ^ (currentRns[1] >> 15));
             currentRns[0] = currentRns[1];
             currentRns[1] = currentRns[2];
             currentRns[2] = nextRn;
-            return normalize100(nextRn);
+            return nextRn;
         }
 
-        static int normalize100(ushort rn)
+        private static int normalize100(ushort rn)
         {
             return (int)Math.Floor(rn / 655.36);
         }
 
         static AttackResult simAttack(ushort[] currentRns, combatPreview attackerPreview)
         {
-            int hitRn1 = advanceRng(currentRns);
-            int hitRn2 = advanceRng(currentRns);
+            int hitRn1 = nextRn(currentRns);
+            int hitRn2 = nextRn(currentRns);
 
             if ((hitRn1 + hitRn2) >= attackerPreview.hit * 2)
             {
@@ -108,14 +118,14 @@ namespace FE8BruteForcer
             bool pierced = false;
             if (attackerPreview.pierce > 0)
             {
-                int pierceRn = advanceRng(currentRns);
+                int pierceRn = nextRn(currentRns);
                 if (pierceRn < attackerPreview.pierce)
                 {
                     pierced = true;
                 }
             }
 
-            int critRn = advanceRng(currentRns);
+            int critRn = nextRn(currentRns);
 
             if (critRn >= attackerPreview.crit)
             {
@@ -123,7 +133,7 @@ namespace FE8BruteForcer
             }
 
             // visual effects RN on crit; disregard
-            advanceRng(currentRns);
+            nextRn(currentRns);
 
             return pierced ? AttackResult.PierceCrit : AttackResult.Crit;
         }
@@ -194,7 +204,7 @@ namespace FE8BruteForcer
             {
                 for (int j = 0; i < 7; i++)
                 {
-                    leveled[j] = (advanceRng(currentRns) < growthRates[j]);
+                    leveled[j] = (nextRn(currentRns) < growthRates[j]);
                     anyLeveled = anyLeveled || leveled[j];
                 }
                 if (anyLeveled)
@@ -212,7 +222,44 @@ namespace FE8BruteForcer
             ushort[] rnsForEp = new ushort[3];
             initialRns.CopyTo(rnsForEp, 0);
 
-            return simValniFloor1Load(rnsForEp);
+            return simfe6c1load(rnsForEp);
+        }
+
+        static bool simfe6c1load(ushort[] currentRns)
+        {
+            int[] archerGrowths = new int[7] { 70, 35, 40, 32, 15, 10, 35 };
+            int[] brigandGrowths = new int[7] { 82, 50, 30, 20, 10, 10, 15 };
+
+            int[] archer1Growths = EnemyStatSim.rollFE6Enemy(currentRns, archerGrowths, 0, 0, 4);
+            int[] brigand1Growths = EnemyStatSim.rollFE6Enemy(currentRns, brigandGrowths, 0, 0, 4);
+            int[] archer1Hmb = EnemyStatSim.rollFE6Enemy(currentRns, archerGrowths, 0, 0, 4);
+            int[] brigand1Hmb = EnemyStatSim.rollFE6Enemy(currentRns, brigandGrowths, 0, 0, 4);
+
+            for (int i = 0; i < 7; i++)
+            {
+                Console.WriteLine(archer1Growths[i] + archer1Hmb[i]);
+            }
+            Console.WriteLine("");
+            for (int i = 0; i < 7; i++)
+            {
+                Console.WriteLine(brigand1Growths[i] + brigand1Hmb[i]);
+            }
+
+            return true;
+        }
+
+        static bool simc2Load(ushort[] currentRns)
+        {
+            int[] brigandGrowths = new int[7] { 75, 50, 35, 25, 10, 13, 15 };
+
+            int[] brigand1Growths = EnemyStatSim.rollFE8Enemy(currentRns, brigandGrowths, 2, 19, 2);
+
+            foreach (int growth in brigand1Growths)
+            {
+                Console.WriteLine(growth);
+            }
+
+            return true;
         }
 
         static bool simValniFloor1Load(ushort[] currentRns)
@@ -222,7 +269,7 @@ namespace FE8BruteForcer
             enemies[1] = new ValniEnemy() { dropRate = 10 };
             enemies[2] = new ValniEnemy() { dropRate = 10 };
 
-            advanceRng(currentRns);
+            nextRn(currentRns);
             ValniEnemyOutput[] outputs = MapLoadingSim.SimValni(currentRns, enemies, 2);
 
             foreach (ValniEnemyOutput output in outputs)
@@ -234,11 +281,11 @@ namespace FE8BruteForcer
 
         static bool simc10t2(ushort[] currentRns)
         {
-            advanceRng(currentRns);
-            advanceRng(currentRns);
-            advanceRng(currentRns);
-            advanceRng(currentRns);
-            advanceRng(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
 
             int ephHp = 23;
 
@@ -260,13 +307,13 @@ namespace FE8BruteForcer
 
             combatPreview fighter1 = new combatPreview(53, 0);
             combatPreview cav2 = new combatPreview(100, 2, false, 0, true, 2);
-            advanceRng(currentRns);
+            nextRn(currentRns);
             simCombat(currentRns, fighter1, cav2);
 
-            advanceRng(currentRns);
-            advanceRng(currentRns);
-            advanceRng(currentRns);
-            advanceRng(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
             MovementSim.simSimpleMovement(currentRns, 1, 1);
 
             combatPreview wyvern1 = new combatPreview(53, 0, false, 0, true, 28, 22, 10);
@@ -286,21 +333,21 @@ namespace FE8BruteForcer
             
             combatPreview boat1 = new combatPreview(49, 0, false, 0, true, 29, 29, 8);
             combatPreview cormag1 = new combatPreview(0, 0, false, 0, false, 30, 0, 12);
-            advanceRng(currentRns);
+            nextRn(currentRns);
             simCombat(currentRns, boat1, cormag1);
 
-            advanceRng(currentRns);
-            advanceRng(currentRns);
-            advanceRng(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
 
             combatPreview shaman1 = new combatPreview(31, 4, false, 0, true, 22, 8, 3);
             combatPreview eph2 = new combatPreview(100, 12, true, 0, true, ephHp, 20, 0);
-            advanceRng(currentRns);
+            nextRn(currentRns);
             result = simCombat(currentRns, shaman1, eph2);
             ephHp = result.Item2;
 
-            advanceRng(currentRns);
-            advanceRng(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
 
             combatPreview fighter2 = new combatPreview(70, 0);
             combatPreview cav3 = new combatPreview(0, 0, false, 0, false);
@@ -310,15 +357,15 @@ namespace FE8BruteForcer
                 return false;
             }
 
-            advanceRng(currentRns);
+            nextRn(currentRns);
 
             combatPreview cav4 = new combatPreview(53, 0, false, 0, true, 29, 15, 0);
             combatPreview eph3 = new combatPreview(0, 0, false, 0, false, ephHp, 0, 7);
-            advanceRng(currentRns);
+            nextRn(currentRns);
             result = simCombat(currentRns, cav4, eph3);
             ephHp = result.Item2;
 
-            advanceRng(currentRns);
+            nextRn(currentRns);
 
             combatPreview beran = new combatPreview(100, 4, true, 0, true, 45, 27, 17);
             combatPreview eph4 = new combatPreview(16, 8, false, 0, true, ephHp, 32, 7);
@@ -334,12 +381,12 @@ namespace FE8BruteForcer
         static bool simc12t1(ushort[] currentRns)
         {
             // fighter move
-            advanceRng(currentRns);
+            nextRn(currentRns);
 
             // far left cav move
             for (int i = 0; i < 11; i++)
             {
-                advanceRng(currentRns);
+                nextRn(currentRns);
             }
 
             // left cav vs eph
@@ -367,7 +414,7 @@ namespace FE8BruteForcer
 
         static bool simc12t2(ushort[] currentRns)
         {
-            advanceRng(currentRns);
+            nextRn(currentRns);
             MovementSim.simSimpleMovement(currentRns, 1, 1);
             combatPreview fighter1 = new combatPreview(53, 0, false, 0, true, 30, 19, 4);
             combatPreview kyle1 = new combatPreview(100, 1, false, 0, true, 25, 15, 9);
@@ -382,7 +429,7 @@ namespace FE8BruteForcer
             combatPreview josh1 = new combatPreview(100, 19, true, 0, true, 29, 19, 7);
             result = simCombat(currentRns, pirate1, josh1);
 
-            advanceRng(currentRns);
+            nextRn(currentRns);
             MovementSim.simSimpleMovement(currentRns, 1, 1);
             combatPreview merc1 = new combatPreview(54, 32, false, 0, true, 30, 18, 7);
             combatPreview cormag1 = new combatPreview(76, 1, false, 2, true, 40, 24, 12);
@@ -392,7 +439,7 @@ namespace FE8BruteForcer
                 return false;
             }
 
-            advanceRng(currentRns);
+            nextRn(currentRns);
             MovementSim.simSimpleMovement(currentRns, 1, 1);
             combatPreview merc2 = new combatPreview(78, 0);
             combatPreview tana1 = new combatPreview(0, 0, false, 0, false);
@@ -404,10 +451,10 @@ namespace FE8BruteForcer
 
             for (int i = 0; i < 6; i++)
             {
-                advanceRng(currentRns);
+                nextRn(currentRns);
             }
             MovementSim.simSimpleMovement(currentRns, 1, 2);
-            advanceRng(currentRns);
+            nextRn(currentRns);
             combatPreview bael1 = new combatPreview(43, 0, false, 0, true, 33, 25, 7);
             combatPreview seth1 = new combatPreview(93, 5, true, 0, true, 30, 20, 13);
             result = simCombat(currentRns, bael1, seth1);
@@ -434,32 +481,32 @@ namespace FE8BruteForcer
 
         static bool simc12t3(ushort[] currentRns)
         {
-            if (advanceRng(currentRns) + advanceRng(currentRns) > 97)
+            if (nextRn(currentRns) + nextRn(currentRns) > 97)
             {
                 return false;
             }
-            if (advanceRng(currentRns) < 2)
+            if (nextRn(currentRns) < 2)
             {
                 return false;
             }
-            if (advanceRng(currentRns) > 4)
+            if (nextRn(currentRns) > 4)
             {
                 return false;
             }
-            advanceRng(currentRns);
-            if (advanceRng(currentRns) + advanceRng(currentRns) < 122)
+            nextRn(currentRns);
+            if (nextRn(currentRns) + nextRn(currentRns) < 122)
             {
-                advanceRng(currentRns);
+                nextRn(currentRns);
             }
-            if (advanceRng(currentRns) + advanceRng(currentRns) > 97)
-            {
-                return false;
-            }
-            if (advanceRng(currentRns) < 2)
+            if (nextRn(currentRns) + nextRn(currentRns) > 97)
             {
                 return false;
             }
-            if (advanceRng(currentRns) > 4)
+            if (nextRn(currentRns) < 2)
+            {
+                return false;
+            }
+            if (nextRn(currentRns) > 4)
             {
                 return false;
             }
@@ -469,8 +516,8 @@ namespace FE8BruteForcer
 
         static bool simc18t1(ushort[] currentRns)
         {
-            advanceRng(currentRns);
-            advanceRng(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
 
             combatPreview garg1 = new combatPreview(56, 0);
             combatPreview phant1 = new combatPreview(85, 0);
@@ -494,9 +541,9 @@ namespace FE8BruteForcer
             }
 
             // not sure what these are
-            advanceRng(currentRns);
-            advanceRng(currentRns);
-            advanceRng(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
+            nextRn(currentRns);
 
             combatPreview gorgon2 = new combatPreview(56, 0);
             combatPreview cormag2 = new combatPreview(0, 0, false, 0, false);
@@ -708,7 +755,7 @@ namespace FE8BruteForcer
         {
             for (int i = 0; i < 6; i++)
             {
-                advanceRng(currentRns);
+                nextRn(currentRns);
             }
 
             MovementSim.simSimpleMovement(currentRns, 0, 1, 100);
@@ -720,7 +767,7 @@ namespace FE8BruteForcer
                 return false;
             }
 
-            advanceRng(currentRns);
+            nextRn(currentRns);
 
             MovementSim.simSimpleMovement(currentRns, 1, 2, 100);
             combatPreview soldier1 = new combatPreview(55, 0, false, 0, true, 28, 19, 2);
@@ -729,7 +776,7 @@ namespace FE8BruteForcer
 
             for (int i = 0; i < 5; i++)
             {
-                advanceRng(currentRns);
+                nextRn(currentRns);
             }
 
             MovementSim.simSimpleMovement(currentRns, 0, 0, 100);

@@ -1,18 +1,22 @@
-﻿namespace FE8BruteForcer
+﻿using System;
+using System.Linq;
+
+namespace FE8BruteForcer
 {
     class MapLoadingSim
     {
         public static void SetValniMovers(ushort[] currentRns, ValniEnemy[] enemies, int numberOfMovers)
         {
             int assignedMovers = 0;
+            ValniEnemy[] possibleMovers = enemies.Where(e => e.special).ToArray();
 
             while (assignedMovers < numberOfMovers)
             {
-                int newIndex = FE8BruteForcer.advanceRng(currentRns) * enemies.Length / 100;
-                if (!enemies[newIndex].moves)
+                int newIndex = FE8BruteForcer.nextRnTrue(currentRns) * possibleMovers.Length / 65536;
+                if (!possibleMovers[newIndex].moves)
                 {
                     assignedMovers += 1;
-                    enemies[newIndex].moves = true;
+                    possibleMovers[newIndex].moves = true;
                 }
             }
         }
@@ -21,39 +25,38 @@
         {
             ValniEnemyOutput output = new ValniEnemyOutput();
 
-            if (input.isBoss)
-            {
-                //stat rolls
-                EnemyStatSim.rollFE8Enemy(currentRns, input.growthRates, false, 0, input.hmLevels);
-            }
-            else
+            if (input.monster)
             {
                 //class
-                FE8BruteForcer.advanceRng(currentRns);
+                FE8BruteForcer.nextRn(currentRns);
 
                 //level
-                FE8BruteForcer.advanceRng(currentRns);
+                FE8BruteForcer.nextRn(currentRns);
                 int LEVELS_PLACEHOLDER = 1; // until i figure out how valni level generation works, this will at least cause stat rolls to happen.
 
                 //held item
-                FE8BruteForcer.advanceRng(currentRns);
-                FE8BruteForcer.advanceRng(currentRns);
+                FE8BruteForcer.nextRn(currentRns);
+                FE8BruteForcer.nextRn(currentRns);
 
                 //dropped item
-                bool doesDrop = (FE8BruteForcer.advanceRng(currentRns) < input.dropRate);
+                bool doesDrop = (FE8BruteForcer.nextRn(currentRns) < input.dropRate);
                 if (doesDrop)
                 {
-                    FE8BruteForcer.advanceRng(currentRns);
+                    FE8BruteForcer.nextRn(currentRns);
                 }
 
                 //stat rolls
-                EnemyStatSim.rollFE8Enemy(currentRns, input.growthRates, input.isPromoted, LEVELS_PLACEHOLDER, input.hmLevels);
+                EnemyStatSim.rollFE8Enemy(currentRns, input.growthRates, input.givePromoAutolevels ? 19 : 0, LEVELS_PLACEHOLDER, input.hmLevels);
+            } 
+            else
+            {
+                EnemyStatSim.rollFE8Enemy(currentRns, input.growthRates, input.givePromoAutolevels ? 19 : 0, input.level, input.hmLevels);
             }
 
             // movement
             if (input.moves)
             {
-                output.position = (octodirection)(FE8BruteForcer.advanceRng(currentRns) * 8 / 100);
+                output.position = (octodirection)(FE8BruteForcer.nextRnTrue(currentRns) * 8 / 65536);
             }
 
             return output;
@@ -82,12 +85,14 @@
 
     public class ValniEnemy
     {
-        public bool isBoss = false;
+        public bool special = false;
+        public bool monster = false;
         public int dropRate = 0;
-        public bool moves = false;
-        public bool isPromoted = false;
-        public int hmLevels = 3;
         public int[] growthRates = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+        public bool givePromoAutolevels = false;
+        public int level = 0;
+        public int hmLevels = 3;
+        public bool moves = false;
     }
 
     public class ValniEnemyOutput

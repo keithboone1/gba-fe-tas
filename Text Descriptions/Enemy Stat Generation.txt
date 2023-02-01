@@ -1,0 +1,30 @@
+﻿When the map loads, enemies are generated one by one, in the order they appear in FEBuilder's Unit Placer. (This is the same order you get by pressing 'down' on the unit page). For the most part, the first enemy generated is the boss, but not always. So you can only really know the first unit by examining in Builder or trial-and-error.
+
+When generating each enemy, the stats are generated as follows:
+
+1. The enemy's unpromoted level-ups are generated. For bosses, this is zero. For unpromoted enemies, this is their level minus 1 and minus any negative difficulty modifier. For promoted enemies, this varies by game and difficulty, but is usually 19 on hard modes.
+2. The enemy's promoted level-ups are generated. For bosses, this is zero. For unpromoted enemies, this is zero. For promoted enemies, this is their level minus 1 and minus any negative difficulty modifier.
+3. The enemy's hard mode level-ups are generated. This varies by game and difficulty, but bosses actually get these.
+
+For each of these three steps, if the number of levels in that step is zero, the generation formula is skipped (so no RNs are burned). However, other steps will happen as normal.
+
+
+The level-up generation formula is as follows:
+
+For each of the stats in order (HP, Str, Skl, Spd, Def, Lck):
+  1. A base level-up rate is calculated from the unit's class growth and number of levels.
+  2. The first RN is normalized between 0.875 and 1.125 (so 0 = 0.875; 32,768 ≈ 1; 65,535 ≈ 1.125) and multiplied by the base rate to get the actual growth.
+  3. The second RN is used to round the actual growth up or down to an integer, weighted by the remainder.
+
+For an example, let's talk about an Archer gaining 4 Str levels at a 35% growth. The RNs rolled are (after normalization) 1.05 and 43, respectively.
+  1. The archer's base rate is 0.35 * 4 = 1.4.
+  2. The base rate is multiplied by the first RN, 1.05 to get 1.47 Str levels.
+  3. The remainder (0.47) is compared to the second RN, 43. Because it's greater, the number rounds up, and the Archer gets 2 Str levels.
+
+This formula rolls 14 RNs (2 per stat * 7 stats). It runs 0-3 times per enemy, so enemy stat generation can take 0, 14, 28, or 42 RNs. The unit's final stats are simply [class bases] + [unpromoted level-ups] + [promoted level-ups] + [hard mode level-ups].
+
+Stat generation has a lot of errata by game:
+  * In FE6 Hard, because of a bug in chapters 1 through 5, HM bonuses are applied twice. The second round of applying HM bonuses happens after stats have been generated for all units. The game does a second pass over all units, applying only hard mode level-ups this time.
+  * In FE7, enemies always have zero Luck, so stat generation burns 12 RNs per step instead of 14.
+  * In FE7, a few bosses are incorrectly flagged, and do get unpromoted and promoted level-ups.
+  * In English FE8 Easy and Normal, because of a bug, if promoted enemies have zero promoted level-ups, they skip their unpromoted level-ups as well.

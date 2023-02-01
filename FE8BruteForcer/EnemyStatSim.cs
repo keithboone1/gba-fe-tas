@@ -13,22 +13,22 @@ namespace FE8BruteForcer
             int length = rollLuck ? 7 : 6;
             int[] coeffs = new int[length];
             int[] rns = new int[length];
-            coeffs[0] = FE8BruteForcer.advanceRng(currentRns);
-            rns[0] = FE8BruteForcer.advanceRng(currentRns);
-            coeffs[1] = FE8BruteForcer.advanceRng(currentRns);
-            rns[1] = FE8BruteForcer.advanceRng(currentRns);
-            coeffs[2] = FE8BruteForcer.advanceRng(currentRns);
-            rns[2] = FE8BruteForcer.advanceRng(currentRns);
-            coeffs[3] = FE8BruteForcer.advanceRng(currentRns);
-            rns[3] = FE8BruteForcer.advanceRng(currentRns);
-            coeffs[4] = FE8BruteForcer.advanceRng(currentRns);
-            rns[4] = FE8BruteForcer.advanceRng(currentRns);
-            coeffs[5] = FE8BruteForcer.advanceRng(currentRns);
-            rns[5] = FE8BruteForcer.advanceRng(currentRns);
+            coeffs[0] = FE8BruteForcer.nextRn(currentRns);
+            rns[0] = FE8BruteForcer.nextRn(currentRns);
+            coeffs[1] = FE8BruteForcer.nextRn(currentRns);
+            rns[1] = FE8BruteForcer.nextRn(currentRns);
+            coeffs[2] = FE8BruteForcer.nextRn(currentRns);
+            rns[2] = FE8BruteForcer.nextRn(currentRns);
+            coeffs[3] = FE8BruteForcer.nextRn(currentRns);
+            rns[3] = FE8BruteForcer.nextRn(currentRns);
+            coeffs[4] = FE8BruteForcer.nextRn(currentRns);
+            rns[4] = FE8BruteForcer.nextRn(currentRns);
+            coeffs[5] = FE8BruteForcer.nextRn(currentRns);
+            rns[5] = FE8BruteForcer.nextRn(currentRns);
             if (rollLuck)
             {
-                coeffs[6] = FE8BruteForcer.advanceRng(currentRns);
-                rns[6] = FE8BruteForcer.advanceRng(currentRns);
+                coeffs[6] = FE8BruteForcer.nextRn(currentRns);
+                rns[6] = FE8BruteForcer.nextRn(currentRns);
             }
 
             int[] procs = new int[length];
@@ -46,42 +46,41 @@ namespace FE8BruteForcer
             return procs;
         }
 
-        public static int[] rollFE6Enemy(ushort[] currentRns, int[] growths, bool isPromoted, int levels, int hardModeLevels, bool doubleHMB)
+        public static int[] rollFE6Enemy(ushort[] currentRns, int[] growths, int unpromotedLevels, int promotedLevels, int hardModeLevels)
         {
-            int[] promotedGains = (isPromoted) ? rollStats(currentRns, growths, 20, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
-            int[] normalGains = (levels > 0) ? rollStats(currentRns, growths, levels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
+            int[] unpromotedGains = (unpromotedLevels > 0) ? rollStats(currentRns, growths, unpromotedLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
+            int[] promotedGains = (promotedLevels > 0) ? rollStats(currentRns, growths, promotedLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
             int[] hmGains = (hardModeLevels > 0) ? rollStats(currentRns, growths, hardModeLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
-            int[] hmGains2 = (doubleHMB) ? rollStats(currentRns, growths, hardModeLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
             int[] finalGains = new int[7];
             for (int i = 0; i < 7; i++)
             {
-                finalGains[i] = promotedGains[i] + normalGains[i] + hmGains[i] + hmGains2[i];
+                finalGains[i] = unpromotedGains[i] + promotedGains[i] + hmGains[i];
             }
             return finalGains;
         }
 
-        public static int[] rollFE7Enemy(ushort[] currentRns, int[] growths, bool isPromoted, int levels, bool giveHardModeLevels)
+        public static int[] rollFE7Enemy(ushort[] currentRns, int[] growths, int unpromotedLevels, int promotedLevels, bool giveHardModeLevels)
         {
-            int[] promotedGains = (isPromoted) ? rollStats(currentRns, growths, 20, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
-            int[] normalGains = (levels > 0) ? rollStats(currentRns, growths, levels, false) : new int[] { 0, 0, 0, 0, 0, 0 };
+            int[] unpromotedGains = (unpromotedLevels > 0) ? rollStats(currentRns, growths, unpromotedLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
+            int[] promotedGains = (promotedLevels > 0) ? rollStats(currentRns, growths, promotedLevels, false) : new int[] { 0, 0, 0, 0, 0, 0 };
             int[] hmGains = (giveHardModeLevels) ? rollStats(currentRns, growths, 5, false) : new int[] { 0, 0, 0, 0, 0, 0 };
             int[] finalGains = new int[6];
             for (int i = 0; i < 6; i++)
             {
-                finalGains[i] = promotedGains[i] + normalGains[i] + hmGains[i];
+                finalGains[i] = unpromotedGains[i] + promotedGains[i] + hmGains[i];
             }
             return finalGains;
         }
 
-        public static int[] rollFE8Enemy(ushort[] currentRns, int[] growths, bool isPromoted, int levels, int hardModeLevels)
+        public static int[] rollFE8Enemy(ushort[] currentRns, int[] growths, int unpromotedLevels, int promotedLevels, int hardModeLevels)
         {
-            int[] promotedGains = (isPromoted) ? rollStats(currentRns, growths, 20, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
-            int[] normalGains = (levels > 0) ? rollStats(currentRns, growths, levels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
+            int[] unpromotedGains = (unpromotedLevels > 0) ? rollStats(currentRns, growths, unpromotedLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
+            int[] promotedGains = (promotedLevels > 0) ? rollStats(currentRns, growths, promotedLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
             int[] hmGains = (hardModeLevels > 0) ? rollStats(currentRns, growths, hardModeLevels, true) : new int[] { 0, 0, 0, 0, 0, 0, 0 };
             int[] finalGains = new int[7];
             for (int i = 0; i < 7; i++)
             {
-                finalGains[i] = promotedGains[i] + normalGains[i] + hmGains[i];
+                finalGains[i] = unpromotedGains[i] + promotedGains[i] + hmGains[i];
             }
             return finalGains;
         }
