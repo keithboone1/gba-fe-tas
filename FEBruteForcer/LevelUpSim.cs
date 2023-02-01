@@ -11,7 +11,7 @@
 
             for (int i = 0; i < 3; i++)
             {
-                for (int j = 0; i < 7; i++)
+                for (int j = 0; j < 7; j++)
                 {
                     int guaranteed = growthRates[j] / 100;
                     int randomPortion = growthRates[j] % 100;

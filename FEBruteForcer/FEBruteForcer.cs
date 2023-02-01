@@ -123,7 +123,7 @@ namespace FEBruteForcer
             ushort[] rnsForEp = new ushort[3];
             initialRns.CopyTo(rnsForEp, 0);
 
-            return TestCases.simc10t2();
+            return TestCases.simfe6c1ep1();
         }
     }
 }

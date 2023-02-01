@@ -6,6 +6,96 @@ namespace FEBruteForcer
     // Plus can use them to regression test...
     class TestCases
     {
+        // input: 61695 48618 6768
+        // output: RN1: 49210 (75) RN2: 37768 (57) RN3: 2801 (4)
+        public static bool simroylevel()
+        {
+            FEBruteForcer.game = 6;
+
+            //roy attacks
+            CombatPreview roy = new CombatPreview() { hit = 83, crit = 11, atk = 11 };
+            CombatPreview fighter = new CombatPreview() { currentHp = 19, def = 4 };
+            (int, int) result1 = CombatSim.simCombat(roy, fighter);
+            if (result1.Item2 > 0)
+            {
+                return false;
+            }
+
+            //roy levels up
+            int[] royGrowths = new int[7] { 80, 40, 50, 40, 25, 30, 60 };
+            int[] royLevel = LevelUpSim.simLevel(royGrowths);
+            if (royLevel[0] == 0 || royLevel[1] == 0 || royLevel[2] == 0 || royLevel[3] == 0 || royLevel[4] == 0 || royLevel[5] == 0 || royLevel[6] == 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        // input: 13701 27333 178
+        // output: RN1: 987 (1) RN2: 14872 (22) RN3: 10298 (15)
+        public static bool simfe6c1ep1()
+        {
+            FEBruteForcer.game = 6;
+
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+            FEBruteForcer.nextRn();
+
+            int royHp = 18;
+
+            // fighter 1
+            CombatPreview fighter1 = new CombatPreview() { hit = 42, currentHp = 26, atk = 16, def = 4 };
+            CombatPreview roy1 = new CombatPreview() { hit = 83, crit = 11, currentHp = royHp, atk = 11, def = 5 };
+            MovementSim.simSimpleMovement(0, 0);
+            (int, int) result = CombatSim.simCombat(fighter1, roy1);
+            if (result.Item1 == 26 || result.Item2 == 18)
+            {
+                return false;
+            }
+            royHp = result.Item2;
+
+            // fighter 2
+            CombatPreview fighter2 = new CombatPreview() { hit = 43, currentHp = 26, atk = 16, def = 2 };
+            CombatPreview roy2 = new CombatPreview() { hit = 100, crit = 10, currentHp = royHp, atk = 11, def = 5 };
+            MovementSim.simSimpleMovement(3, 1);
+            result = CombatSim.simCombat(fighter2, roy2);
+            if (result.Item1 > 1 || result.Item2 < 1)
+            {
+                return false;
+            }
+            royHp = result.Item2;
+
+            // fighter 3
+            CombatPreview fighter3 = new CombatPreview() { hit = 44, currentHp = 26, atk = 16, def = 2 };
+            CombatPreview roy3 = new CombatPreview() { hit = 100, crit = 11, currentHp = royHp, atk = 11, def = 5 };
+            MovementSim.simSimpleMovement(1, 1);
+            result = CombatSim.simCombat(fighter3, roy3);
+            if (result.Item1 > 0 || result.Item2 < 1)
+            {
+                return false;
+            }
+
+            FEBruteForcer.nextRn();
+
+            // archer
+            CombatPreview archer1 = new CombatPreview() { hit = 74, atk = 13 };
+            CombatPreview roy4 = new CombatPreview() { inRange = false, currentHp = royHp, def = 5 };
+            MovementSim.simSimpleMovement(1, 4);
+            result = CombatSim.simCombat(archer1, roy4);
+            if (result.Item2 < 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public static bool simfe6c1load()
         {
             FEBruteForcer.game = 6;

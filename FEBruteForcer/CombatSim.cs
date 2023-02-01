@@ -55,7 +55,7 @@ namespace FEBruteForcer
             }
 
             bool silencer = false;
-            if (crit)
+            if (FEBruteForcer.game != 6 && crit)
             {
                 int silencerRn = FEBruteForcer.nextRn();
                 if (attackerPreview.silencer && silencerRn < 50)
