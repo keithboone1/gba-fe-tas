@@ -1,4 +1,4 @@
-This folder contains plaintext descriptions of the RNG phenomena I've studied in FE8. It is mostly safe to assume that these work the same in FE7 / 6, but I haven't really tested it in those games. These will be 100% non-developer-friendly, so I will not be making any references to the code.
+This folder contains plaintext descriptions of the RNG phenomena I've studied in FE8. It is mostly safe to assume that these work the same in FE7 / 6, but I'm less confident, although I have done some testing. These will be 100% non-developer-friendly, so I will not be making any references to the code.
 
 On the flipside, developers might want to read these to help them understand the code. My ideal goal is that the code is self documenting, but right now this project is extremely ghetto and it might stay that way forever.
 
