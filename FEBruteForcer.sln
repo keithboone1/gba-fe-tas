@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FEBruteForcer", "FE8BruteForcer\FEBruteForcer.csproj", "{29F75AB3-3B1E-4273-A615-629034F5412B}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Text Descriptions", "Text Descriptions", "{2C3F8704-8E3B-43BA-A1AB-EAD77F4DCE4D}"
 	ProjectSection(SolutionItems) = preProject
 		Text Descriptions\Combat.txt = Text Descriptions\Combat.txt
@@ -16,16 +14,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Text Descriptions", "Text D
 		Text Descriptions\Valni and Lagdou Enemy Stat Generation.txt = Text Descriptions\Valni and Lagdou Enemy Stat Generation.txt
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FEBruteForcer", "FEBruteForcer\FEBruteForcer.csproj", "{53FCA954-D862-475B-BB58-BB3A85A5E3C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{29F75AB3-3B1E-4273-A615-629034F5412B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{29F75AB3-3B1E-4273-A615-629034F5412B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{29F75AB3-3B1E-4273-A615-629034F5412B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{29F75AB3-3B1E-4273-A615-629034F5412B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53FCA954-D862-475B-BB58-BB3A85A5E3C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53FCA954-D862-475B-BB58-BB3A85A5E3C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53FCA954-D862-475B-BB58-BB3A85A5E3C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53FCA954-D862-475B-BB58-BB3A85A5E3C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
