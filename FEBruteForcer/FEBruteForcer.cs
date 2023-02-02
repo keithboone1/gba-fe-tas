@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Linq;
 
 namespace FEBruteForcer
 {
     class FEBruteForcer
     {
+        public static int game = 0; // set this in your test case or it will fail
+        private static ushort[] currentRns = new ushort[3];
+
         static void Main(string[] args)
         {
             while (true)
@@ -23,7 +27,7 @@ namespace FEBruteForcer
             }
         }
 
-        static void rnPrompt()
+        private static void rnPrompt()
         {
             Console.WriteLine("enter rn1, rn2, rn3:");
 
@@ -58,19 +62,27 @@ namespace FEBruteForcer
             }
         }
 
-        static void bruteForce()
+        private static void bruteForce()
         {
             int burned = 0;
+
+            ushort[] inputRns = new ushort[3];
+            currentRns.CopyTo(inputRns, 0);
 
             ushort[] initialRns = new ushort[3];
             currentRns.CopyTo(initialRns, 0);
 
-            while (!theseRnsWork(initialRns))
+            while (!theseRnsWork())
             {
                 burned += 1;
                 initialRns.CopyTo(currentRns, 0);
                 nextRn();
                 currentRns.CopyTo(initialRns, 0);
+
+                if (currentRns.SequenceEqual(inputRns))
+                {
+                    throw new Exception("Checked every single seed, no successes.");
+                }
             }
 
             initialRns.CopyTo(currentRns, 0);
@@ -81,9 +93,10 @@ namespace FEBruteForcer
             Console.WriteLine(string.Format("RN3: {0} ({1})", initialRns[2], normalize100(initialRns[2])));
         }
 
-        // switch game-specific behavior
-        public static int game = 0;
-        private static ushort[] currentRns = new ushort[3];
+        private static bool theseRnsWork()
+        {
+            return TestCases.simroylevel(); // change this line per test case
+        }
 
         public static int nextRnTrue()
         {
@@ -115,15 +128,6 @@ namespace FEBruteForcer
                 return (int)Math.Floor(rn / 655.36);
             }
             throw new Exception("Remember to set the game");
-        }
-
-        // the bit that actually changes by enemy phase
-        static bool theseRnsWork(ushort[] initialRns)
-        {
-            ushort[] rnsForEp = new ushort[3];
-            initialRns.CopyTo(rnsForEp, 0);
-
-            return TestCases.simfe6c1ep1();
         }
     }
 }

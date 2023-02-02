@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace FEBruteForcer
 {
@@ -77,10 +78,7 @@ namespace FEBruteForcer
                 for (int i = 0; i < enemies.Length; i++)
                 {
                     int[] doubledHmb = rollEnemy(enemies[i].growthRates, 0, 0, enemies[i].hardModeLevels);
-                    for (int j = 0; j < doubledHmb.Length; j++)
-                    {
-                        grownStats[i][j] += doubledHmb[j];
-                    }
+                    grownStats[i] = grownStats[i].Zip(doubledHmb, (a, b) => a + b).ToArray();
                 }
             }
 
