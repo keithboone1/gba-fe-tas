@@ -64,7 +64,7 @@ namespace FEBruteForcer
 
         private static void bruteForce()
         {
-            int burned = 0;
+            long burned = 0;
 
             ushort[] inputRns = new ushort[3];
             currentRns.CopyTo(inputRns, 0);
